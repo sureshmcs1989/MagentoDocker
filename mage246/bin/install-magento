@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+su root <<EOSU
+
+/var/www/src/bin/magento setup:install \
+--base-url=$MAGENTO_URL \
+--db-host=$MYSQL_HOST \
+--db-name=$MYSQL_DATABASE \
+--db-user=$MYSQL_USER \
+--db-password=$MYSQL_ROOT_PASSWORD \
+--admin-firstname=$MAGENTO_ADMIN_FIRSTNAME \
+--admin-lastname=$MAGENTO_ADMIN_LASTNAME \
+--admin-email=$MAGENTO_ADMIN_EMAIL \
+--admin-user=$MAGENTO_ADMIN_USERNAME \
+--admin-password=$MAGENTO_ADMIN_PASSWORD \
+--language=$MAGENTO_LANGUAGE \
+--currency=$MAGENTO_DEFAULT_CURRENCY \
+--timezone=$MAGENTO_TIMEZONE \
+--use-rewrites=1 \
+--backend-frontname=$MAGENTO_BACKEND_FRONTNAME \
+--search-engine=$MAGENTO_SEARCH_ENGINE  \
+--opensearch-host=$MAGENTO_SEARCH_ENGINE_HOST \
+--opensearch-port=$MAGENTO_SEARCH_ENGINE_PORT
+
+/var/www/src/bin/magento sampledata:deploy
+/var/www/src/bin/magento deploy:mode:set developer
+/var/www/src/bin/magento setup:upgrade
+/var/www/src/bin/magento setup:static-content:deploy -f
+/var/www/src/bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth
+/var/www/src/bin/magento module:disable Magento_TwoFactorAuth
+/var/www/src/bin/magento cache:clean
+
+EOSU
